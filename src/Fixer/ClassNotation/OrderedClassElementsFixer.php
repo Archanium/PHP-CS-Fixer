@@ -92,6 +92,7 @@ final class OrderedClassElementsFixer extends AbstractFixer implements Configura
         'destruct' => null,
         'magic' => null,
         'phpunit' => null,
+        'codeception' => null,
     ];
 
     /**
@@ -282,6 +283,7 @@ class Example
                     'destruct',
                     'magic',
                     'phpunit',
+                    'codeception',
                     'method_public',
                     'method_protected',
                     'method_private',
@@ -426,9 +428,28 @@ class Example
                 [T_STRING, 'assertPostConditions'],
                 [T_STRING, 'tearDown'],
                 [T_STRING, 'doTearDown'],
+                [T_STRING, '_before'],
+                [T_STRING, '_beforeStep'],
+                [T_STRING, '_beforeSuite'],
+                [T_STRING, '_after'],
+                [T_STRING, '_afterStep'],
+                [T_STRING, '_afterSuite']
             ], false)
         ) {
             return ['phpunit', strtolower($nameToken->getContent())];
+        }
+        
+        if (
+            $nameToken->equalsAny([
+                [T_STRING, '_before'],
+                [T_STRING, '_beforeStep'],
+                [T_STRING, '_beforeSuite'],
+                [T_STRING, '_after'],
+                [T_STRING, '_afterStep'],
+                [T_STRING, '_afterSuite']
+            ], false)
+        ) {
+            return ['codeception', strtolower($nameToken->getContent())];
         }
 
         return str_starts_with($nameToken->getContent(), '__') ? 'magic' : 'method';
@@ -476,6 +497,15 @@ class Example
             'teardown' => 9,
             'doteardown' => 10,
         ];
+        
+        static $codeceptionPositions = [
+            '_beforeSuite' => 1,
+            '_afterSuite' => 2,
+            '_before' => 3,
+            '_after' => 4,
+            '_beforeStep' => 5,
+            '_afterStep' => 6,
+        ];
 
         foreach ($elements as &$element) {
             $type = $element['type'];
@@ -486,6 +516,9 @@ class Example
 
                     if ('phpunit' === $type) {
                         $element['position'] += $phpunitPositions[$element['name']];
+                    }
+                    if ('codeception' === $type) {
+                        $element['position'] += $codeceptionPositions[$element['name']];
                     }
 
                     continue;
