@@ -427,13 +427,7 @@ class Example
                 [T_STRING, 'assertPreConditions'],
                 [T_STRING, 'assertPostConditions'],
                 [T_STRING, 'tearDown'],
-                [T_STRING, 'doTearDown'],
-                [T_STRING, '_before'],
-                [T_STRING, '_beforeStep'],
-                [T_STRING, '_beforeSuite'],
-                [T_STRING, '_after'],
-                [T_STRING, '_afterStep'],
-                [T_STRING, '_afterSuite']
+                [T_STRING, 'doTearDown']
             ], false)
         ) {
             return ['phpunit', strtolower($nameToken->getContent())];
